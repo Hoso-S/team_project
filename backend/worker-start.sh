@@ -4,7 +4,7 @@
 # 実行コマンド: bash worker-start.sh
 
 # 仮想環境のフォルダのパス
-venv_folder="backend/venv"
+venv_folder="venv"
 
 # フォルダが存在するかどうかを確認
 if [ -d "$venv_folder" ]; then
