@@ -14,8 +14,17 @@ else
     # フォルダが存在しない場合の処理
     echo "Target folder does not exist."
     echo "Creating python venv and installing requirements"
+    sudo apt install python3.11-venv -y
     python3 -m venv venv
-    pip install -r backend/requirements.txt
+    
+    # 仮想環境を有効化
+    source venv/bin/activate
+
+    # requirements.txtに記載されているパッケージをインストール
+    pip install -r requirements.txt
+    
+    # 仮想環境を無効化
+    deactivate
 fi
 
 # 仮想環境を有効化
