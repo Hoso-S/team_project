@@ -28,6 +28,7 @@ else
 fi
 
 # 仮想環境を有効化
+echo "activating venv.."
 source venv/bin/activate
 
 # uvicornnの起動コマンド
