@@ -1,4 +1,3 @@
 node_modules/
-backend/sql_app/__pycache__
+backend/sql_app/__pycache__/
 backend/venv
-.gitignore
