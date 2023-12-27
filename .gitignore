@@ -1,4 +1,4 @@
 node_modules/
 backend/venv
 backend/sql_app/__pycache__/
-backend/sql_app/__pycache__/*
+backend/sql_app/__pycache__/*.*
