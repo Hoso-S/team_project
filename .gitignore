@@ -1,4 +1,27 @@
+
+package-lock.json
 node_modules/
+dist/
+build/
+
 backend/venv
 backend/sql_app/__pycache__
 backend/dev.db
+
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+
+# Thumbnails
+._*
+
+### Linux ###
+#.*
+!.gitignore
+*~
+
+
