@@ -4,5 +4,6 @@ sqlalchemy
 uvicorn
 gunicorn
 setproctitle
+python-jose[cryptography]
 ###### Requirements with Version Specifiers ######
 
