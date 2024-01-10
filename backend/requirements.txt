@@ -2,6 +2,7 @@
 fastapi
 sqlalchemy
 uvicorn
-
+gunicorn
+setproctitle
 ###### Requirements with Version Specifiers ######
 

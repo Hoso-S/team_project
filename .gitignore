@@ -5,7 +5,9 @@ dist/
 build/
 
 backend/venv
+backend/logs
 backend/sql_app/__pycache__
+backend/gunicorn_config/__pycache__
 backend/dev.db
 
 
