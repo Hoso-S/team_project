@@ -10,22 +10,22 @@ jobs:
 
     runs-on: ubuntu-latest
 
-steps:
-  - name: Install SSH key
-    uses: shimataro/ssh-key-action@v1
-    with: 
-      key: ${{ secrets.SSH_PRIVATE_KEY }} 
-      name: id_rsa
-      known_hosts: ${{ secrets.KNOWN_HOSTS }} 
-      config: |
-            Host nic
-              HostName 118.240.154.3
-              Port 50022
-              User johndoe
-              IdentityFile ~/.ssh/id_rsa
+  steps:
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v1
+      with: 
+        key: ${{ secrets.SSH_PRIVATE_KEY }} 
+        name: id_rsa
+        known_hosts: ${{ secrets.KNOWN_HOSTS }} 
+        config: |
+              Host nic
+                HostName 118.240.154.3
+                Port 50022
+                User johndoe
+                IdentityFile ~/.ssh/id_rsa
 
-  - name: run deploy script
-    run: cd ~/team_project && git pull origin main && ./deploy.sh
+    - name: run deploy script
+      run: cd ~/team_project && git pull origin main && ./deploy.sh
 
     # steps:
     #   - uses: actions/checkout@v2
