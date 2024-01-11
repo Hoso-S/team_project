@@ -22,7 +22,7 @@ jobs:
                   User johndoe
                   IdentityFile ~/.ssh/id_rsa
       - name: run deploy script
-        run: cd ~/team_project && git pull origin main && ./deploy.sh
+        run: ssh nic "cd ~/team_project && git pull origin main && ./deploy.sh"
 
     # steps:
     #   - uses: actions/checkout@v2
