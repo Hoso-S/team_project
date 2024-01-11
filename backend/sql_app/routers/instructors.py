@@ -30,7 +30,7 @@ class instructor_update(BaseModel):
 
 
 ## helper functions
-def create_instructor(db: Session, instructor: instructor):
+def insert_instructor(db: Session, instructor: instructor):
     db_instructor = database.instructor(**instructor.model_dump())
     db.add(db_instructor)
     db.commit()
@@ -50,7 +50,7 @@ def get_instructors(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.instructor).offset(skip).limit(limit).all()
 
 
-def delete_instructor(db: Session, instructor_id: str):
+def del_instructor(db: Session, instructor_id: str):
     db.query(database.instructor).filter(
         database.instructor.instructor_id == instructor_id
     ).delete()
@@ -80,7 +80,7 @@ async def create_instructor(instructor: instructor, db: Session = Depends(get_db
     db_instructor = get_instructor(db, instructor_id=instructor.instructor_id)
     if db_instructor:
         raise HTTPException(status_code=400, detail="Instructor already registered")
-    return create_instructor(db=db, instructor=instructor)
+    return insert_instructor(db=db, instructor=instructor)
 
 
 @router.delete("/{instructor_id}")
@@ -88,4 +88,4 @@ async def delete_instructor(instructor_id: str, db: Session = Depends(get_db)):
     db_instructor = get_instructor(db, instructor_id=instructor_id)
     if db_instructor is None:
         raise HTTPException(status_code=404, detail="Instructor not found")
-    return delete_instructor(db=db, instructor_id=instructor_id)
+    return del_instructor(db=db, instructor_id=instructor_id)

@@ -37,7 +37,7 @@ class section_update(BaseModel):
 
 
 ## helper functions
-def create_section(db: Session, section: section):
+def insert_section(db: Session, section: section):
     db_section = database.section(**section.model_dump())
     db.add(db_section)
     db.commit()
@@ -68,7 +68,7 @@ def get_sections(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.section).offset(skip).limit(limit).all()
 
 
-def delete_section(db: Session, course_id: str, sec_id: str, semester: str, year: int):
+def del_section(db: Session, course_id: str, sec_id: str, semester: str, year: int):
     db.query(database.section).filter(database.section.course_id == course_id).filter(
         database.section.sec_id == sec_id
     ).filter(database.section.semester == semester).filter(
@@ -122,7 +122,7 @@ async def create_section(section: section, db: Session = Depends(get_db)):
     )
     if db_section:
         raise HTTPException(status_code=400, detail="Section already registered")
-    return create_section(db=db, section=section)
+    return insert_section(db=db, section=section)
 
 
 @router.delete("/{course_id}/{instructor_id}/{sec_id}/{semester}/{year}")
@@ -144,7 +144,7 @@ async def delete_section(
     )
     if db_section is None:
         raise HTTPException(status_code=404, detail="Section not found")
-    return delete_section(
+    return del_section(
         db=db,
         course_id=course_id,
         instructor_id=instructor_id,

@@ -30,7 +30,7 @@ class student_update(BaseModel):
 
 
 ## helper functions
-def create_student(db: Session, student: student):
+def insert_student(db: Session, student: student):
     db_student = database.student(**student.model_dump())
     db.add(db_student)
     db.commit()
@@ -48,7 +48,7 @@ def get_students(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.student).offset(skip).limit(limit).all()
 
 
-def delete_student(db: Session, student_id: str):
+def del_student(db: Session, student_id: str):
     db.query(database.student).filter(database.student.student_id == student_id).delete()
     db.commit()
     return
@@ -74,7 +74,7 @@ async def create_student(student: student, db: Session = Depends(get_db)):
     db_student = get_student(db, student_id=student.student_id)
     if db_student:
         raise HTTPException(status_code=400, detail="Student already registered")
-    return create_student(db=db, student=student)
+    return insert_student(db=db, student=student)
 
 
 @router.delete("/{student_id}")
@@ -82,4 +82,4 @@ async def delete_student(student_id: str, db: Session = Depends(get_db)):
     db_student = get_student(db, student_id=student_id)
     if db_student is None:
         raise HTTPException(status_code=404, detail="Student not found")
-    return delete_student(db=db, student_id=student_id)
+    return del_student(db=db, student_id=student_id)

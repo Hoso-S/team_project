@@ -29,7 +29,7 @@ class classroom_update(BaseModel):
 
 
 ## helper functions
-def create_classroom(db: Session, classroom: classroom):
+def insert_classroom(db: Session, classroom: classroom):
     db_classroom = database.classroom(**classroom.model_dump())
     db.add(db_classroom)
     db.commit()
@@ -50,7 +50,7 @@ def get_classrooms(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.classroom).offset(skip).limit(limit).all()
 
 
-def delete_classroom(db: Session, building: str, room_number: str):
+def del_classroom(db: Session, building: str, room_number: str):
     db.query(database.classroom).filter(database.classroom.building == building).filter(
         database.classroom.room_number == room_number
     ).delete()
@@ -84,7 +84,7 @@ async def create_classroom(classroom: classroom, db: Session = Depends(get_db)):
     )
     if db_classroom:
         raise HTTPException(status_code=400, detail="Classroom already registered")
-    return create_classroom(db=db, classroom=classroom)
+    return insert_classroom(db=db, classroom=classroom)
 
 
 @router.delete("/{building}/{room_number}")
@@ -94,4 +94,4 @@ async def delete_classroom(
     db_classroom = get_classroom(db, building=building, room_number=room_number)
     if db_classroom is None:
         raise HTTPException(status_code=404, detail="Classroom not found")
-    return delete_classroom(db=db, building=building, room_number=room_number)
+    return del_classroom(db=db, building=building, room_number=room_number)

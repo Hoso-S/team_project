@@ -29,7 +29,7 @@ class department_update(BaseModel):
 
 
 ## helper functions
-def create_department(db: Session, department: department):
+def insert_department(db: Session, department: department):
     db_department = database.department(**department.model_dump())
     db.add(db_department)
     db.commit()
@@ -49,7 +49,7 @@ def get_departments(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.department).offset(skip).limit(limit).all()
 
 
-def delete_department(db: Session, dept_name: str):
+def del_department(db: Session, dept_name: str):
     db.query(database.department).filter(
         database.department.dept_name == dept_name
     ).delete()
@@ -79,7 +79,7 @@ async def create_department(department: department, db: Session = Depends(get_db
     db_department = get_department(db, dept_name=department.dept_name)
     if db_department:
         raise HTTPException(status_code=400, detail="Department already registered")
-    return create_department(db=db, department=department)
+    return insert_department(db=db, department=department)
 
 
 @router.delete("/{dept_name}")
@@ -87,4 +87,4 @@ async def delete_department(dept_name: str, db: Session = Depends(get_db)):
     db_department = get_department(db, dept_name=dept_name)
     if db_department is None:
         raise HTTPException(status_code=404, detail="Department not found")
-    return delete_department(db=db, dept_name=dept_name)
+    return del_department(db=db, dept_name=dept_name)

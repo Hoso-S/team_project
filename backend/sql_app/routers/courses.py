@@ -30,7 +30,7 @@ class course_update(BaseModel):
 
 
 ## helper functions
-def create_course(db: Session, course: course):
+def insert_course(db: Session, course: course):
     db_course = database.course(**course.model_dump())
     db.add(db_course)
     db.commit()
@@ -46,7 +46,7 @@ def get_courses(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.course).offset(skip).limit(limit).all()
 
 
-def delete_course(db: Session, course_id: str):
+def del_course(db: Session, course_id: str):
     db.query(database.course).filter(database.course.course_id == course_id).delete()
     db.commit()
     return
@@ -72,7 +72,7 @@ def create_course(course: course, db: Session = Depends(get_db)):
     db_course = get_course(db, course_id=course.course_id)
     if db_course:
         raise HTTPException(status_code=400, detail="Course already registered")
-    return create_course(db=db, course=course)
+    return insert_course(db=db, course=course)
 
 
 @router.delete("/{course_id}")
@@ -80,4 +80,4 @@ def delete_course(course_id: str, db: Session = Depends(get_db)):
     db_course = get_course(db, course_id=course_id)
     if db_course is None:
         raise HTTPException(status_code=404, detail="Course not found")
-    return delete_course(db=db, course_id=course_id)
+    return del_course(db=db, course_id=course_id)

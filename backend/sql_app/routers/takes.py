@@ -32,7 +32,7 @@ class takes_update(BaseModel):
 
 
 ## helper functions
-def create_takes(db: Session, takes: takes):
+def insert_takes(db: Session, takes: takes):
     db_takes = database.takes(**takes.model_dump())
     db.add(db_takes)
     db.commit()
@@ -58,7 +58,7 @@ def get_all_takes(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.takes).offset(skip).limit(limit).all()
 
 
-def delete_takes(
+def del_takes(
     db: Session, student_id: str, course_id: str, sec_id: str, semester: str, year: int
 ):
     db.query(database.takes).filter(database.takes.student_id == student_id).filter(
@@ -116,7 +116,7 @@ async def create_takes(takes: takes, db: Session = Depends(get_db)):
     )
     if db_takes:
         raise HTTPException(status_code=400, detail="Takes already registered")
-    return create_takes(db=db, takes=takes)
+    return insert_takes(db=db, takes=takes)
 
 
 @router.delete("/{student_id}/{course_id}/{sec_id}/{semester}/{year}")
@@ -138,7 +138,7 @@ async def delete_takes(
     )
     if db_takes is None:
         raise HTTPException(status_code=404, detail="Takes not found")
-    return delete_takes(
+    return del_takes(
         db=db,
         student_id=student_id,
         course_id=course_id,

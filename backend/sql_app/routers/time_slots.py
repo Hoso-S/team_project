@@ -36,7 +36,7 @@ class time_slot_update(BaseModel):
 
 
 ## helper functions
-def create_time_slot(db: Session, time_slot: time_slot):
+def insert_time_slot(db: Session, time_slot: time_slot):
     db_time_slot = database.time_slot(**time_slot.model_dump())
     db.add(db_time_slot)
     db.commit()
@@ -56,7 +56,7 @@ def get_time_slots(db: Session, skip: int = 0, limit: int = 100):
     return db.query(database.time_slot).offset(skip).limit(limit).all()
 
 
-def delete_time_slot(db: Session, time_slot_id: str):
+def del_time_slot(db: Session, time_slot_id: str):
     db.query(database.time_slot).filter(
         database.time_slot.time_slot_id == time_slot_id
     ).delete()
@@ -86,7 +86,7 @@ async def create_time_slot(time_slot: time_slot, db: Session = Depends(get_db)):
     db_time_slot = get_time_slot(db, time_slot_id=time_slot.time_slot_id)
     if db_time_slot:
         raise HTTPException(status_code=400, detail="Time_slot already registered")
-    return create_time_slot(db=db, time_slot=time_slot)
+    return insert_time_slot(db=db, time_slot=time_slot)
 
 
 @router.delete("/{time_slot_id}")
@@ -94,4 +94,4 @@ async def delete_time_slot(time_slot_id: str, db: Session = Depends(get_db)):
     db_time_slot = get_time_slot(db, time_slot_id=time_slot_id)
     if db_time_slot is None:
         raise HTTPException(status_code=404, detail="Time_slot not found")
-    return delete_time_slot(db=db, time_slot_id=time_slot_id)
+    return del_time_slot(db=db, time_slot_id=time_slot_id)
