@@ -7,15 +7,19 @@ on:
 
 jobs:
   deploy:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to On-Premises
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/i.key
-          chmod 600 ~/.ssh/i.key
-          ssh -i ~/.ssh/i.key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
+      - uses: actions/checkout@v1
+
+      - name: ssh key generate
+        run: echo "$SSH_PRIVATE_KEY" > key && chmod 600 key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: rsync deploy
+        run: |
+          ssh -i key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
