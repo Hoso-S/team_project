@@ -15,6 +15,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   useNavigate,
 } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import { loginState } from "../../atoms/loginState"
 
 function Copyright(props) {
   return (
@@ -33,6 +35,8 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function Login() {
+  const [, setIsLogin] = useRecoilState(loginState)
+
   const navigate = useNavigate();
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -42,6 +46,7 @@ export default function Login() {
       password: data.get('password'),
     });
     navigate('/home');
+    setIsLogin(() => true);
   };
 
   return (
