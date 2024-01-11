@@ -10,28 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install SSH key
-        uses: shimataro/ssh-key-action@v1
+        uses: webfactory/ssh-agent@v0.5.4
         with: 
-          private-key: ${{ secrets.SSH_PRIVATE_KEY }} 
-          name: id_rsa
-          known-hosts: ${{ secrets.KNOWN_HOSTS }} 
-          config: |
-                Host nic
-                  HostName 118.240.154.3
-                  Port 50022
-                  User johndoe
-                  IdentityFile ~/.ssh/id_rsa
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: run deploy script
-        run: chmod 600 ~/.ssh/id_rsa && ssh -i ~/.ssh/id_rsa johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
+        run: |
+          ssh -o StrictHostKeyChecking=no johndoe@118.240.154.3 -p 50022 "ls"
 
-    # steps:
-    #   - uses: actions/checkout@v2
-    #   - name: Deploy to On-Premises
-    #     env:
-    #       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-    #       KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
-    #     run: |
-    #       mkdir -p ~/.ssh
-    #       echo "$SSH_PRIVATE_KEY" > ~/.ssh/key && chmod 600 ~/.ssh/key
-    #       echo "$KNOWN_HOST" > ~/.ssh/known_hosts
-    #       ssh -i ~/.ssh/key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
+
+# steps:
+#   - name: Install SSH key
+#     uses: shimataro/ssh-key-action@v1
+#     with: 
+#       private-key: ${{ secrets.SSH_PRIVATE_KEY }} 
+#       name: id_rsa
+#       known-hosts: ${{ secrets.KNOWN_HOSTS }} 
+#       config: |
+#             Host nic
+#               HostName 118.240.154.3
+#               Port 50022
+#               User johndoe
+#               IdentityFile ~/.ssh/id_rsa
+#   - name: run deploy script
+#     run: chmod 600 ~/.ssh/id_rsa && ssh -i ~/.ssh/id_rsa johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
