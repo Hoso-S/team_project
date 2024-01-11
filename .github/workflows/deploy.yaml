@@ -20,6 +20,6 @@ jobs:
 
       - name: rsync deploy
         run: |
-          ssh -i key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
+          rm -f ~/.ssh/known_hosts && ssh -i key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
