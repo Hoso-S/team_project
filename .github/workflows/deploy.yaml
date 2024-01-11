@@ -15,7 +15,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: run deploy script
         run: |
-          ssh -o StrictHostKeyChecking=no johndoe@118.240.154.3 -p 50022 "ls"
+          ssh -o StrictHostKeyChecking=no johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
 
 
 # steps:
