@@ -18,6 +18,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
         run: |
-          echo "$SSH_PRIVATE_KEY" > key && chmod 600 key
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/key && chmod 600 ~/.ssh/key
           echo "$KNOWN_HOST" > ~/.ssh/known_hosts
-          ssh -i key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
+          ssh -i ~/.ssh/key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
