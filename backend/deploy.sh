@@ -3,3 +3,5 @@
 
 echo "Do something"
 
+
+./worker-start.sh
