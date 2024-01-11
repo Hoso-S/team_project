@@ -16,20 +16,3 @@ jobs:
       - name: run deploy script
         run: |
           ssh -o StrictHostKeyChecking=no johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
-
-
-# steps:
-#   - name: Install SSH key
-#     uses: shimataro/ssh-key-action@v1
-#     with: 
-#       private-key: ${{ secrets.SSH_PRIVATE_KEY }} 
-#       name: id_rsa
-#       known-hosts: ${{ secrets.KNOWN_HOSTS }} 
-#       config: |
-#             Host nic
-#               HostName 118.240.154.3
-#               Port 50022
-#               User johndoe
-#               IdentityFile ~/.ssh/id_rsa
-#   - name: run deploy script
-#     run: chmod 600 ~/.ssh/id_rsa && ssh -i ~/.ssh/id_rsa johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
