@@ -13,13 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: ssh key generate
+      - name: register ssh key
         run: echo "$SSH_PRIVATE_KEY" > key && chmod 600 key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
+      - name: known host
+        run: echo "$KNOWN_HOST" > ~/.ssh/known_hosts
+        env:
+          KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
       - name: rsync deploy
         run: |
-          rm -f ~/.ssh/known_hosts && ssh -i key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh -i key johndoe@118.240.154.3 -p 50022 "cd ~/team_project && git pull origin main && ./deploy.sh"
