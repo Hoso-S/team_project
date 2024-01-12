@@ -2,6 +2,10 @@
 fastapi
 sqlalchemy
 uvicorn
-
+gunicorn
+setproctitle
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
 ###### Requirements with Version Specifiers ######
 

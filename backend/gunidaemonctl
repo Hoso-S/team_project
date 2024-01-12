@@ -1,0 +1,111 @@
+#!/bin/env bash
+# There is NO warranty!
+
+GUNICORN_CONFIG_PATH="./gunicorn_config/"
+LOGS_DIR="logs"
+LOGS_FILE="${LOGS_DIR}/gunidaemonctl_log.txt"
+OPERATION=$1
+APP_ID=$2
+GUNICORN_CONF="${GUNICORN_CONFIG_PATH}${APP_ID}.py"
+VERSION=0.1.1
+
+function valid_pid() {
+  if [[ $1 =~ ^([0-9]{1,})$ ]]; then
+    return 1
+  fi
+  return 0
+}
+
+function get_time() {
+  date=$(date '+%Y-%m-%d %H:%M:%S')
+  date="[${date}]"
+  echo $date
+}
+
+function get_pid () {
+  pid=`ps ax -o pid,args | grep gunicorn | grep -v grep | grep $APP_ID | grep master | awk '{print $1}'`
+  echo $pid
+}
+
+function show_usage_and_exit() {
+  echo "gunidaemonctl Ver.${VERSION} (There is NO WARRANTY!)"
+  echo ""
+  echo "Usage:"
+  echo "gunidaemonctl [operation] [app_id]"
+  echo ""
+  echo "[app_id]: It shoud be defined by the filename of the gunicorn config file. e.g.) '[app_id].py'"
+  echo "[operation]: start | ps | pid | stop"	
+  exit 1
+}
+
+function operation_start () {
+  time=`get_time`
+  echo "${time} The gunicorn was tried to launch." 2>&1 | tee -a $LOGS_FILE
+  source venv/bin/activate
+  gunicorn -c $GUNICORN_CONF
+}
+
+function operation_ps () {
+  time=`get_time`
+  echo "${time} The list of processes:" 2>&1 | tee -a $LOGS_FILE
+  ps aux | grep gunicorn | grep -v grep | grep $APP_ID 2>&1 | tee -a $LOGS_FILE
+}
+
+function operation_pid () {
+  time=`get_time`
+  pid=`get_pid`
+  
+  valid_pid $pid
+  if [ $? -eq 1 ]; then
+    echo "${time} The master pid is ${pid}." 2>&1 | tee -a $LOGS_FILE
+  else
+    echo "${time} The pid for your app is not found." 2>&1 | tee -a $LOGS_FILE
+  fi
+}
+
+function operation_stop() {
+  time=`get_time`
+  pid=`get_pid`
+
+  ps aux >> $LOGS_FILE 2>&1
+  
+  valid_pid $pid
+  if [ $? -eq 1 ]; then
+    echo "${time} The master pid(${pid}) was killed." 2>&1 | tee -a $LOGS_FILE
+    kill $pid
+  else
+    echo "${time} The pid for your app is not found." 2>&1 | tee -a $LOGS_FILE
+  fi
+}
+
+if [ $# -ne 2 ]; then
+  show_usage_and_exit
+fi
+
+if [ ! -d "$LOGS_DIR" ]; then
+  `mkdir -p $LOGS_DIR`;
+fi
+
+if [ ! -f "$GUNICORN_CONF" ]; then
+  echo "The gunicorn_config_file (${GUNICORN_CONF}) does NOT EXIST."
+  exit 1
+fi
+
+
+case "$OPERATION" in
+  "start")
+    operation_start
+    ;;
+  "ps")
+    operation_ps
+    ;;
+  "pid")
+    operation_pid
+    ;;
+  "stop")
+    operation_stop
+    ;;
+  *)
+    echo "The [operation] you set is invalid."
+    ;;
+esac
