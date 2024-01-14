@@ -31,7 +31,7 @@ app = FastAPI(
 # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
 # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
 # "http://localhost:8080"
-BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost"]
+BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["http://localhost:5173"]
 
 # Set all CORS enabled origins
 if BACKEND_CORS_ORIGINS:
