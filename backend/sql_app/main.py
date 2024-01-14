@@ -1,6 +1,7 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends
 
-from .dependencies import get_db
+from .security import oauth2_scheme
+# from .dependencies import get_db
 from .database import Base, engine
 from .routers import (
     users,
@@ -21,7 +22,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Collaborative Development",
-    description="AIIT Collaborative Development Project"
+    description="AIIT Collaborative Development Project",
 )
 
 
@@ -38,8 +39,9 @@ api_router.include_router(time_slots.router)
 api_router.include_router(takes.router)
 app.include_router(api_router, prefix="/api")
 
+
 @app.get("/")
-async def root():
+async def root(token: str = Depends(oauth2_scheme)):
     return {
         "message": "Hello CollaborativeDevelopment!!!",
     }
