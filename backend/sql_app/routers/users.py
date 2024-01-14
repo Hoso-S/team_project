@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -51,7 +51,7 @@ def insert_user(db: Session, user: UserCreate):
 
 ## Endpoint to section
 @router.post("/", response_model=UserOut)
-def create_user(user: UserCreate, db: SessionDep):
+def create_user(db: SessionDep, user: UserCreate):
     db_user = get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -65,7 +65,7 @@ def read_users(db: SessionDep, skip: int = 0, limit: int = 100):
 
 
 @router.get("/{user_id}", response_model=UserOut)
-def read_user(user_id: int, db: SessionDep):
+def read_user(db: SessionDep, user_id: int):
     db_user = get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")

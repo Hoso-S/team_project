@@ -1,10 +1,10 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
-from typing import  Literal
+from typing import Literal
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -84,12 +84,12 @@ def del_section(db: Session, course_id: str, sec_id: str, semester: str, year: i
     response_model=section,
 )
 async def read_section(
+    db: SessionDep,
     course_id: str,
     instructor_id: str,
     sec_id: str,
     semester: str,
     year: int,
-    db: Session = Depends(get_db),
 ):
     db_section = get_section(
         db,
@@ -105,13 +105,13 @@ async def read_section(
 
 
 @router.get("/", response_model=list[section])
-async def read_sections(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_sections(db: SessionDep, skip: int = 0, limit: int = 100):
     sections = get_sections(db, skip=skip, limit=limit)
     return sections
 
 
 @router.post("/", response_model=section)
-async def create_section(section: section, db: Session = Depends(get_db)):
+async def create_section(db: SessionDep, section: section):
     db_section = get_section(
         db,
         course_id=section.course_id,
@@ -127,12 +127,12 @@ async def create_section(section: section, db: Session = Depends(get_db)):
 
 @router.delete("/{course_id}/{instructor_id}/{sec_id}/{semester}/{year}")
 async def delete_section(
+    db: SessionDep,
     course_id: str,
     instructor_id: str,
     sec_id: str,
     semester: str,
     year: int,
-    db: Session = Depends(get_db),
 ):
     db_section = get_section(
         db=db,

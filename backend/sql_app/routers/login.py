@@ -1,13 +1,13 @@
 from datetime import timedelta
 from typing import Annotated
 from fastapi import Depends, APIRouter, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from fastapi.security import OAuth2PasswordRequestForm
 
 from . import users
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from ..security import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     create_access_token,
@@ -38,7 +38,7 @@ def authenticate(db: Session, email: str, password: str):
 ## Endpoint to login
 @router.post("/access-token")
 def login_access_token(
-    db:Annotated[Session, Depends(get_db)], form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    db: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
     user = authenticate(db=db, email=form_data.username, password=form_data.password)
     if not user:

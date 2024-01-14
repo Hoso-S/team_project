@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel, PositiveInt
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -39,7 +39,9 @@ def insert_course(db: Session, course: course):
 
 
 def get_course(db: Session, course_id: str):
-    return db.query(database.course).filter(database.course.course_id == course_id).first()
+    return (
+        db.query(database.course).filter(database.course.course_id == course_id).first()
+    )
 
 
 def get_courses(db: Session, skip: int = 0, limit: int = 100):
@@ -54,7 +56,7 @@ def del_course(db: Session, course_id: str):
 
 ## Endpoint to Course
 @router.get("/{course_id}", response_model=course)
-def read_course(course_id: str, db: Session = Depends(get_db)):
+def read_course(db: SessionDep, course_id: str):
     db_course = get_course(db, course_id=course_id)
     if db_course is None:
         raise HTTPException(status_code=404, detail="Course not found")
@@ -62,13 +64,13 @@ def read_course(course_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[course])
-def read_courses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_courses(db: SessionDep, skip: int = 0, limit: int = 100):
     courses = get_courses(db, skip=skip, limit=limit)
     return courses
 
 
 @router.post("/", response_model=course)
-def create_course(course: course, db: Session = Depends(get_db)):
+def create_course(db: SessionDep, course: course):
     db_course = get_course(db, course_id=course.course_id)
     if db_course:
         raise HTTPException(status_code=400, detail="Course already registered")
@@ -76,7 +78,7 @@ def create_course(course: course, db: Session = Depends(get_db)):
 
 
 @router.delete("/{course_id}")
-def delete_course(course_id: str, db: Session = Depends(get_db)):
+def delete_course(db: SessionDep, course_id: str):
     db_course = get_course(db, course_id=course_id)
     if db_course is None:
         raise HTTPException(status_code=404, detail="Course not found")

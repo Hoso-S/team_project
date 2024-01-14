@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel, PositiveFloat
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -59,7 +59,7 @@ def del_department(db: Session, dept_name: str):
 
 ## Endpoint to Department
 @router.get("/{dept_name}", response_model=department)
-async def read_department(dept_name: str, db: Session = Depends(get_db)):
+async def read_department(db: SessionDep, dept_name: str):
     db_department = get_department(db, dept_name=dept_name)
     if db_department is None:
         raise HTTPException(status_code=404, detail="Department not found")
@@ -67,15 +67,13 @@ async def read_department(dept_name: str, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[department])
-async def read_departments(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
-):
+async def read_departments(db: SessionDep, skip: int = 0, limit: int = 100):
     departments = get_departments(db, skip=skip, limit=limit)
     return departments
 
 
 @router.post("/", response_model=department)
-async def create_department(department: department, db: Session = Depends(get_db)):
+async def create_department(db: SessionDep, department: department):
     db_department = get_department(db, dept_name=department.dept_name)
     if db_department:
         raise HTTPException(status_code=400, detail="Department already registered")
@@ -83,7 +81,7 @@ async def create_department(department: department, db: Session = Depends(get_db
 
 
 @router.delete("/{dept_name}")
-async def delete_department(dept_name: str, db: Session = Depends(get_db)):
+async def delete_department(db: SessionDep, dept_name: str):
     db_department = get_department(db, dept_name=dept_name)
     if db_department is None:
         raise HTTPException(status_code=404, detail="Department not found")

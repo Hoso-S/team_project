@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel, PositiveFloat
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -60,7 +60,7 @@ def del_instructor(db: Session, instructor_id: str):
 
 ## Endpoint to Classroom
 @router.get("/{instructor_id}", response_model=instructor)
-async def read_instructor(instructor_id: str, db: Session = Depends(get_db)):
+async def read_instructor(db: SessionDep, instructor_id: str):
     db_instructor = get_instructor(db, instructor_id=instructor_id)
     if db_instructor is None:
         raise HTTPException(status_code=404, detail="Instructor not found")
@@ -68,15 +68,13 @@ async def read_instructor(instructor_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[instructor])
-async def read_instructors(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
-):
+async def read_instructors(db: SessionDep, skip: int = 0, limit: int = 100):
     instructors = get_instructors(db, skip=skip, limit=limit)
     return instructors
 
 
 @router.post("/", response_model=instructor)
-async def create_instructor(instructor: instructor, db: Session = Depends(get_db)):
+async def create_instructor(db: SessionDep, instructor: instructor):
     db_instructor = get_instructor(db, instructor_id=instructor.instructor_id)
     if db_instructor:
         raise HTTPException(status_code=400, detail="Instructor already registered")
@@ -84,7 +82,7 @@ async def create_instructor(instructor: instructor, db: Session = Depends(get_db
 
 
 @router.delete("/{instructor_id}")
-async def delete_instructor(instructor_id: str, db: Session = Depends(get_db)):
+async def delete_instructor(db: SessionDep, instructor_id: str):
     db_instructor = get_instructor(db, instructor_id=instructor_id)
     if db_instructor is None:
         raise HTTPException(status_code=404, detail="Instructor not found")

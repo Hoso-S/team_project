@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel, PositiveInt
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -40,7 +40,9 @@ def insert_student(db: Session, student: student):
 
 def get_student(db: Session, student_id: str):
     return (
-        db.query(database.student).filter(database.student.student_id == student_id).first()
+        db.query(database.student)
+        .filter(database.student.student_id == student_id)
+        .first()
     )
 
 
@@ -49,14 +51,16 @@ def get_students(db: Session, skip: int = 0, limit: int = 100):
 
 
 def del_student(db: Session, student_id: str):
-    db.query(database.student).filter(database.student.student_id == student_id).delete()
+    db.query(database.student).filter(
+        database.student.student_id == student_id
+    ).delete()
     db.commit()
     return
 
 
 ## Endpoint to Student
 @router.get("/{student_id}", response_model=student)
-async def read_student(student_id: str, db: Session = Depends(get_db)):
+async def read_student(db: SessionDep, student_id: str):
     db_student = get_student(db, student_id=student_id)
     if db_student is None:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -64,13 +68,13 @@ async def read_student(student_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[student])
-async def read_students(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_students(db: SessionDep, skip: int = 0, limit: int = 100):
     students = get_students(db, skip=skip, limit=limit)
     return students
 
 
 @router.post("/", response_model=student)
-async def create_student(student: student, db: Session = Depends(get_db)):
+async def create_student(db: SessionDep, student: student):
     db_student = get_student(db, student_id=student.student_id)
     if db_student:
         raise HTTPException(status_code=400, detail="Student already registered")
@@ -78,7 +82,7 @@ async def create_student(student: student, db: Session = Depends(get_db)):
 
 
 @router.delete("/{student_id}")
-async def delete_student(student_id: str, db: Session = Depends(get_db)):
+async def delete_student(db: SessionDep, student_id: str):
     db_student = get_student(db, student_id=student_id)
     if db_student is None:
         raise HTTPException(status_code=404, detail="Student not found")
