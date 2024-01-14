@@ -5,11 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-
 from . import users
-from ..dependencies import SessionDep
+from ..dependencies import SessionDep, SettingsDep
+from ..cookie import CookieTransport
 from ..security import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
     create_access_token,
     verify_password,
 )
@@ -17,6 +16,8 @@ from ..security import (
 
 ## Create the FastAPI login instance
 router = APIRouter(prefix="/login", tags=["login"])
+
+cookie_transport = CookieTransport(cookie_max_age=3600)
 
 
 ## Schema for login
@@ -38,14 +39,15 @@ def authenticate(db: Session, email: str, password: str):
 ## Endpoint to login
 @router.post("/access-token")
 def login_access_token(
-    db: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    db: SessionDep,
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    settings: SettingsDep,
 ) -> Token:
     user = authenticate(db=db, email=form_data.username, password=form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    return Token(
-        access_token=create_access_token(user.id, expires_delta=access_token_expires)
-    )
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(settings, user.id, access_token_expires)
+    return Token(access_token=access_token, token_type="bearer")

@@ -7,5 +7,6 @@ setproctitle
 python-multipart
 python-jose[cryptography]
 passlib[bcrypt]
+pydantic-settings
 ###### Requirements with Version Specifiers ######
 

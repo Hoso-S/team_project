@@ -10,7 +10,7 @@ backend/sql_app/__pycache__
 backend/sql_app/routers/__pycache__
 backend/gunicorn_config/__pycache__
 backend/dev.db
-
+backend/.env
 
 ### OSX ###
 .DS_Store
