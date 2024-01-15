@@ -1,7 +1,7 @@
 // import { useState } from 'react'
 // import './App.css'
 import Router from './routes'
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -13,8 +13,7 @@ import Grid from '@mui/material/Grid';
 import Navigation from './components/Navigation/Navigation'
 import { useRecoilState } from "recoil";
 import { loginState } from "./atoms/loginState"
-
-const defaultTheme = createTheme();
+import theme from './assets/theme'
 
 function Copyright(props) {
   return (
@@ -30,7 +29,7 @@ function App() {
 
   return (
     <>
-      <ThemeProvider theme={defaultTheme}>
+      <ThemeProvider theme={theme}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
           {isLogin && <Navigation />}
