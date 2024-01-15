@@ -38,12 +38,12 @@ const columns = [
 ];
 
 const grades = [
-  { name: 'A', value: 95 },
-  { name: 'B', value: 88 },
-  { name: 'C', value: 72 },
-  { name: 'D', value: 64 },
-  { name: 'E', value: 52 },
-  { name: 'F', value: 48 }
+  { name: '0', value: 3 },
+  { name: '1', value: 2 },
+  { name: '2', value: 6 },
+  { name: '3', value: 12 },
+  { name: '4', value: 16 },
+  { name: '5', value: 4 }
 ];
 
 export default function Home() {
