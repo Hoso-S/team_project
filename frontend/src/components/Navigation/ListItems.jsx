@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Link } from 'react-router-dom';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -12,8 +11,8 @@ import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
 export const mainListItems = (
-  <React.Fragment>
-    <ListItemButton component={Link} to={"/home"}>
+  <>
+    <ListItemButton component={Link} to={"/"}>
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
@@ -43,11 +42,11 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="受講" />
     </ListItemButton>
-  </React.Fragment>
+  </>
 );
 
 export const secondaryListItems = (
-  <React.Fragment>
+  <>
     <ListSubheader component="div" inset>
       その他
     </ListSubheader>
@@ -69,5 +68,5 @@ export const secondaryListItems = (
       </ListItemIcon>
       <ListItemText primary="TBU_3" />
     </ListItemButton>
-  </React.Fragment>
+  </>
 );
