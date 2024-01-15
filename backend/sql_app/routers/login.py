@@ -6,15 +6,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from fastapi_csrf_protect import CsrfProtect
-from fastapi_csrf_protect.exceptions import CsrfProtectError
 
 from . import users
 from ..dependencies import SessionDep, SettingsDep
 from ..cookie import CookieTransport
-from ..security import (
-    create_access_token,
-    verify_password,
-)
+from ..security import CsrfSettings, create_access_token, verify_password, verify_csrf
 
 
 ## Create the FastAPI login instance
@@ -27,15 +23,6 @@ cookie_transport = CookieTransport(cookie_max_age=3600)
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
-
-
-class CsrfSettings(BaseModel):
-    secret_key: str = "Kaakaww!"
-
-
-@CsrfProtect.load_config
-def get_csrf_config():
-    return CsrfSettings()
 
 
 ## helper functions
@@ -51,10 +38,10 @@ def authenticate(db: Session, email: str, password: str):
 ## Endpoint to login
 @router.post("/access-token")
 def login_access_token(
-    request: Request,
     db: SessionDep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     settings: SettingsDep,
+    request: Request,
     csrf_protect: CsrfProtect = Depends(),
 ) -> Token:
     csrf_protect.validate_csrf(request)
@@ -68,11 +55,3 @@ def login_access_token(
     response: JSONResponse = JSONResponse(status_code=200, content={"detail": "OK"})
     csrf_protect.unset_csrf_cookie(response)
     return Token(access_token=access_token, token_type="bearer")
-
-
-@router.get("/csrftoken/")
-async def get_csrf_token(csrf_protect: CsrfProtect = Depends()):
-    csrf_token, signed_token = csrf_protect.generate_csrf_tokens()
-    response = JSONResponse(status_code=200, content={"csrf_token": "cookie"})
-    csrf_protect.set_csrf_cookie(signed_token, response)
-    return response
