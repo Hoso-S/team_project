@@ -18,6 +18,8 @@ import { Box } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 // const rows = [
 //     { id: 1, col1: 'Hello', col2: 'World' },
@@ -35,6 +37,15 @@ const columns = [
     { field: 'time_slot_id', headerName: 'タイムスロット', width: 150, headerAlign: 'center' },
 ];
 
+const grades = [
+  { name: 'A', value: 95 },
+  { name: 'B', value: 88 },
+  { name: 'C', value: 72 },
+  { name: 'D', value: 64 },
+  { name: 'E', value: 52 },
+  { name: 'F', value: 48 }
+];
+
 export default function Home() {
   const onClickSearch = () => {
     console.log('search');
@@ -50,8 +61,78 @@ export default function Home() {
     setYear(newValue)
   }
 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedRow, setSelectedRow] = useState({});
+
+  const handleRowClick = (params) => {
+    setSelectedRow(params.row);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <>
+      <Box sx={{ mb: 3 }}>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="panel1-content"
+            id="panel1-header"
+          >
+            <Typography>登録</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Box sx={{ display: 'flex' }}>
+              <Grid container>
+                <Grid item xs={12} sm={12}>
+                  <FormControl fullWidth>
+                    <TextField id="course-name" label="コース名" variant="standard" />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+                  {/* <TextField id="year" label="年度" variant="standard" /> */}
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="年度"
+                      value={year}
+                      onChange={handleYearChange}
+                      views={['year']}
+                      slot={{ textField: { variant: 'outlined' } }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+                  <FormControl sx={{ minWidth: 180 }}>
+                    <InputLabel id="semester-select-label">セメスター</InputLabel>
+                    <Select
+                      labelId="semester-select-label"
+                      value={semester}
+                      onChange={(handleSemesterChange)}
+                    >
+                      <MenuItem value={1}>Spring</MenuItem>
+                      <MenuItem value={2}>Summer</MenuItem>
+                      <MenuItem value={3}>Fall</MenuItem>
+                      <MenuItem value={4}>Winter</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    onClick={onClickSearch}
+                    sx={{ mt: 3, ml: 1 }}
+                  >
+                    検索
+                  </Button>
+                </Box>
+              </Grid>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+      </Box>
       <Box sx={{ mb: 3 }}>
         <Accordion>
           <AccordionSummary
@@ -69,7 +150,7 @@ export default function Home() {
                     <TextField id="course-name" label="コース名" variant="standard" />
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={12} sx={{ mt: 1 }}>
+                <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
                   {/* <TextField id="year" label="年度" variant="standard" /> */}
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
@@ -81,12 +162,11 @@ export default function Home() {
                     />
                   </LocalizationProvider>
                 </Grid>
-                <Grid item xs={12} sm={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">セメスター</InputLabel>
+                <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
+                  <FormControl sx={{ minWidth: 180 }}>
+                    <InputLabel id="semester-select-label">セメスター</InputLabel>
                     <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
+                      labelId="semester-select-label"
                       value={semester}
                       onChange={(handleSemesterChange)}
                     >
@@ -112,7 +192,34 @@ export default function Home() {
         </Accordion>
       </Box>
       <Box>
-        <DataGrid rows={courseSection} getRowId={(row) => `${row.course_id}-${row.sec_id}`} columns={columns} />
+        <DataGrid
+          rows={courseSection}
+          getRowId={(row) => `${row.course_id}-${row.sec_id}`}
+          columns={columns}
+          onRowClick={handleRowClick} 
+        />
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>成績分布</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {`ID: ${selectedRow.id || ''}`}
+              <br />
+              {`Name: ${selectedRow.name || ''}`}
+              {/* その他のデータ... */}
+              <BarChart width={800} height={300} data={grades}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#8884d8" />
+              </BarChart>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>閉じる</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </>
   );
