@@ -9,14 +9,11 @@ from fastapi_csrf_protect import CsrfProtect
 
 from . import users
 from ..dependencies import SessionDep
-from ..cookie import CookieTransport
 from ..security import settings, create_access_token, verify_password
 
 
 ## Create the FastAPI login instance
 router = APIRouter(prefix="/login", tags=["login"])
-
-cookie_transport = CookieTransport(cookie_max_age=3600)
 
 
 ## Schema for login
