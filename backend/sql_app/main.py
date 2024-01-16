@@ -59,7 +59,7 @@ api_router.include_router(sections.router, dependencies=[Depends(oauth2_scheme)]
 api_router.include_router(students.router, dependencies=[Depends(oauth2_scheme)])
 api_router.include_router(time_slots.router, dependencies=[Depends(oauth2_scheme)])
 api_router.include_router(takes.router, dependencies=[Depends(oauth2_scheme)])
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router)
 
 
 ## CSRF Protect
@@ -99,7 +99,7 @@ async def root():
     }
 
 
-@app.get("/api/csrftoken", response_model=Csrf)
+@app.get("/csrftoken", response_model=Csrf)
 async def get_csrf_token(csrf_protect: CsrfProtect = Depends()):
     csrf_token, _ = csrf_protect.generate_csrf_tokens()
     return {"csrf_token": csrf_token}
