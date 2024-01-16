@@ -59,7 +59,7 @@ api_router.include_router(sections.router, dependencies=[Depends(oauth2_scheme)]
 api_router.include_router(students.router, dependencies=[Depends(oauth2_scheme)])
 api_router.include_router(time_slots.router, dependencies=[Depends(oauth2_scheme)])
 api_router.include_router(takes.router, dependencies=[Depends(oauth2_scheme)])
-app.include_router(api_router, prefix="/api")
+app.include_router(api_router)
 
 
 ## CSRF Protect
