@@ -1,8 +1,10 @@
 from fastapi import FastAPI, APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from typing import List
+from secrets import token_urlsafe
 from pydantic import BaseModel, AnyHttpUrl
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 
@@ -43,6 +45,8 @@ if BACKEND_CORS_ORIGINS:
         allow_headers=["*"],
     )
 
+## Session Middleware
+app.add_middleware(SessionMiddleware, secret_key=token_urlsafe(32))
 
 api_router = APIRouter()
 api_router.include_router(login.router)
@@ -76,14 +80,38 @@ def csrf_protect_error_handler(_: Request, exc: CsrfProtectError):
     )
 
 
+@app.middleware("http")
+async def some_middleware(request: Request, call_next):
+    response = await call_next(request)
+    session = request.cookies.get("session")
+    if session:
+        response.set_cookie(
+            key="session", value=request.cookies.get("session"), httponly=True
+        )
+    return response
+
+
+## Root endpoint
+@app.get("/")
+async def root():
+    return {
+        "message": "Hello CollaborativeDevelopment!!!",
+    }
+
+
 @app.get("/csrftoken", response_model=Csrf)
 async def get_csrf_token(csrf_protect: CsrfProtect = Depends()):
     csrf_token, _ = csrf_protect.generate_csrf_tokens()
     return {"csrf_token": csrf_token}
 
 
-@app.get("/")
-async def root():
-    return {
-        "message": "Hello CollaborativeDevelopment!!!",
-    }
+@app.get("/session_set")
+async def session_set(request: Request):
+    request.session["my_var"] = "1234"
+    return "ok"
+
+
+@app.get("/session_info")
+async def session_info(request: Request):
+    my_var = request.session.get("my_var", None)
+    return my_var
