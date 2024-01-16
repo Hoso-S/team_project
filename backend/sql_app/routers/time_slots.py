@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -66,7 +66,7 @@ def del_time_slot(db: Session, time_slot_id: str):
 
 ## Endpoint to Classroom
 @router.get("/{time_slot_id}", response_model=time_slot)
-async def read_time_slot(time_slot_id: str, db: Session = Depends(get_db)):
+async def read_time_slot(db: SessionDep, time_slot_id: str):
     db_time_slot = get_time_slot(db, time_slot_id=time_slot_id)
     if db_time_slot is None:
         raise HTTPException(status_code=404, detail="Time_slot not found")
@@ -74,15 +74,13 @@ async def read_time_slot(time_slot_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[time_slot])
-async def read_time_slots(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
-):
+async def read_time_slots(db: SessionDep, skip: int = 0, limit: int = 100):
     time_slots = get_time_slots(db, skip=skip, limit=limit)
     return time_slots
 
 
 @router.post("/", response_model=time_slot)
-async def create_time_slot(time_slot: time_slot, db: Session = Depends(get_db)):
+async def create_time_slot(db: SessionDep, time_slot: time_slot):
     db_time_slot = get_time_slot(db, time_slot_id=time_slot.time_slot_id)
     if db_time_slot:
         raise HTTPException(status_code=400, detail="Time_slot already registered")
@@ -90,7 +88,7 @@ async def create_time_slot(time_slot: time_slot, db: Session = Depends(get_db)):
 
 
 @router.delete("/{time_slot_id}")
-async def delete_time_slot(time_slot_id: str, db: Session = Depends(get_db)):
+async def delete_time_slot(db: SessionDep, time_slot_id: str):
     db_time_slot = get_time_slot(db, time_slot_id=time_slot_id)
     if db_time_slot is None:
         raise HTTPException(status_code=404, detail="Time_slot not found")

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -60,9 +60,7 @@ def del_classroom(db: Session, building: str, room_number: str):
 
 ## Endpoint to Classroom
 @router.get("/{building}/{room_number}", response_model=classroom)
-async def read_classroom(
-    building: str, room_number: str, db: Session = Depends(get_db)
-):
+async def read_classroom(db: SessionDep, building: str, room_number: str):
     db_classroom = get_classroom(db, building=building, room_number=room_number)
     if db_classroom is None:
         raise HTTPException(status_code=404, detail="Classroom not found")
@@ -70,15 +68,13 @@ async def read_classroom(
 
 
 @router.get("/", response_model=list[classroom])
-async def read_classrooms(
-    skip: int = 0, limit: int = 100, db: Session = Depends(get_db)
-):
+async def read_classrooms(db: SessionDep, skip: int = 0, limit: int = 100):
     classrooms = get_classrooms(db, skip=skip, limit=limit)
     return classrooms
 
 
 @router.post("/", response_model=classroom)
-async def create_classroom(classroom: classroom, db: Session = Depends(get_db)):
+async def create_classroom(db: SessionDep, classroom: classroom):
     db_classroom = get_classroom(
         db, building=classroom.building, room_number=classroom.room_number
     )
@@ -88,9 +84,7 @@ async def create_classroom(classroom: classroom, db: Session = Depends(get_db)):
 
 
 @router.delete("/{building}/{room_number}")
-async def delete_classroom(
-    building: str, room_number: str, db: Session = Depends(get_db)
-):
+async def delete_classroom(db: SessionDep, building: str, room_number: str):
     db_classroom = get_classroom(db, building=building, room_number=room_number)
     if db_classroom is None:
         raise HTTPException(status_code=404, detail="Classroom not found")

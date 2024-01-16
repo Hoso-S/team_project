@@ -1,9 +1,9 @@
 from fastapi import APIRouter
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_db
+from ..dependencies import SessionDep
 from .. import database
 
 
@@ -78,12 +78,12 @@ def del_takes(
     response_model=takes,
 )
 async def read_takes(
+    db: SessionDep,
     student_id: str,
     course_id: str,
     sec_id: str,
     semester: str,
     year: int,
-    db: Session = Depends(get_db),
 ):
     db_takes = get_takes(
         db,
@@ -99,13 +99,13 @@ async def read_takes(
 
 
 @router.get("/", response_model=list[takes])
-async def read_takes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_takes(db: SessionDep, skip: int = 0, limit: int = 100):
     takes = get_takes(db, skip=skip, limit=limit)
     return takes
 
 
 @router.post("/", response_model=takes)
-async def create_takes(takes: takes, db: Session = Depends(get_db)):
+async def create_takes(db: SessionDep, takes: takes):
     db_takes = get_takes(
         db,
         ID=takes.student_id,
@@ -121,12 +121,12 @@ async def create_takes(takes: takes, db: Session = Depends(get_db)):
 
 @router.delete("/{student_id}/{course_id}/{sec_id}/{semester}/{year}")
 async def delete_takes(
+    db: SessionDep,
     student_id: str,
     course_id: str,
     sec_id: str,
     semester: str,
     year: int,
-    db: Session = Depends(get_db),
 ):
     db_takes = get_takes(
         db,
