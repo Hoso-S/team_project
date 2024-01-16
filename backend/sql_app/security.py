@@ -59,9 +59,3 @@ def get_password_hash(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
-
-
-def verify_csrf(csrf_protect, headers):
-    csrf_token = csrf_protect.get_csrf_from_headers(headers)
-    csrf_protect.validate_csrf(csrf_token)
-    return

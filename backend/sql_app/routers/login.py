@@ -10,7 +10,7 @@ from fastapi_csrf_protect import CsrfProtect
 from . import users
 from ..dependencies import SessionDep
 from ..cookie import CookieTransport
-from ..security import settings, create_access_token, verify_password, verify_csrf
+from ..security import settings, create_access_token, verify_password
 
 
 ## Create the FastAPI login instance
