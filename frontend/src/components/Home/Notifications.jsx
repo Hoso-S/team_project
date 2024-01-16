@@ -14,6 +14,12 @@ function createData(id, date, content, from) {
 const rows = [
   createData(
     0,
+    '2024/1/4',
+    '科目画面を作りました',
+    'やました',
+  ),
+  createData(
+    1,
     '2023/12/28',
     'HOME画面を作りました',
     'やました',
