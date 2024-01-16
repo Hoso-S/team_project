@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 from fastapi_csrf_protect import CsrfProtect
 
 from . import users
-from ..dependencies import SessionDep, SettingsDep
+from ..dependencies import SessionDep
 from ..cookie import CookieTransport
-from ..security import CsrfSettings, create_access_token, verify_password, verify_csrf
+from ..security import settings, create_access_token, verify_password, verify_csrf
 
 
 ## Create the FastAPI login instance
@@ -40,7 +40,6 @@ def authenticate(db: Session, email: str, password: str):
 def login_access_token(
     db: SessionDep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    settings: SettingsDep,
     request: Request,
     csrf_protect: CsrfProtect = Depends(),
 ) -> Token:
@@ -51,7 +50,6 @@ def login_access_token(
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(settings, user.id, access_token_expires)
+    access_token = create_access_token(user.id, access_token_expires)
     response: JSONResponse = JSONResponse(status_code=200, content={"detail": "OK"})
-    csrf_protect.unset_csrf_cookie(response)
     return Token(access_token=access_token, token_type="bearer")

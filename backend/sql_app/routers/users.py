@@ -1,7 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Request
 from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from fastapi_csrf_protect import CsrfProtect
 
 from ..dependencies import SessionDep
 from ..security import get_password_hash
@@ -51,7 +52,13 @@ def insert_user(db: Session, user: UserCreate):
 
 ## Endpoint to section
 @router.post("/", response_model=UserOut)
-def create_user(db: SessionDep, user: UserCreate):
+def create_user(
+    db: SessionDep,
+    user: UserCreate,
+    request: Request,
+    csrf_protect: CsrfProtect = Depends(),
+):
+    csrf_protect.validate_csrf(request)
     db_user = get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")

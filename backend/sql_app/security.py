@@ -1,43 +1,44 @@
 from datetime import datetime, timedelta
+from secrets import token_urlsafe
 from functools import lru_cache
 from typing import Any, Union
 from pydantic import BaseModel
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic_settings import BaseSettings
+from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from passlib.context import CryptContext
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login/access-token")
+Csrf_key = token_urlsafe(32)
 
 
 ## Settings
 class Settings(BaseSettings):
-    SECRET_KEY: str
-    ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", case_sensitive=True
-    )
+    SECRET_KEY: str = token_urlsafe(32)
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
 
-@lru_cache
-def get_settings():
-    return Settings()
+settings = Settings()
 
 
 class CsrfSettings(BaseModel):
-    secret_key: str = "asecrettoeverybody"
+    secret_key: str = Csrf_key
     cookie_samesite: str = "none"
     cookie_secure: bool = True
     token_location: str = "body"
     token_key: str = "csrf-token"
 
 
+@lru_cache
+def get_settings(settings):
+    return settings
+
+
 def create_access_token(
-    settings: Settings, subject: Union[str, Any], expires_delta: timedelta = None
+    subject: Union[str, Any], expires_delta: timedelta = None
 ) -> str:
     if expires_delta:
         expire = datetime.utcnow() + expires_delta

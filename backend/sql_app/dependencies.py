@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from .security import oauth2_scheme, Settings, get_settings
+from .security import oauth2_scheme, settings
 from .database import SessionLocal
 from .database import users as db_users
 
@@ -30,7 +30,7 @@ class TokenData(BaseModel):
 
 ## Dependency for token
 TokenDep = Annotated[str, Depends(oauth2_scheme)]
-SettingsDep = Annotated[Settings, Depends(get_settings)]
+
 
 
 ## Dependency for database
@@ -43,7 +43,7 @@ SessionDep = Annotated[Session, Depends(get_db)]
 
 
 ## Dependency for current user
-async def get_current_user(db: SessionDep, token: TokenDep, settings: SettingsDep):
+async def get_current_user(db: SessionDep, token: TokenDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
