@@ -99,7 +99,7 @@ async def root():
     }
 
 
-@app.get("/csrftoken", response_model=Csrf)
+@app.get("/api/csrftoken", response_model=Csrf)
 async def get_csrf_token(csrf_protect: CsrfProtect = Depends()):
     csrf_token, _ = csrf_protect.generate_csrf_tokens()
     return {"csrf_token": csrf_token}
