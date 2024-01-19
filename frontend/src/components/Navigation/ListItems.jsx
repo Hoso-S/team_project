@@ -18,13 +18,13 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Home" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={Link} to={"/student"}>
       <ListItemIcon>
         <ShoppingCartIcon />
       </ListItemIcon>
       <ListItemText primary="生徒" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={Link} to={"/instructor"}>
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
@@ -36,37 +36,11 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="科目" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton component={Link} to={"/take"}>
       <ListItemIcon>
         <LayersIcon />
       </ListItemIcon>
       <ListItemText primary="受講" />
-    </ListItemButton>
-  </>
-);
-
-export const secondaryListItems = (
-  <>
-    <ListSubheader component="div" inset>
-      その他
-    </ListSubheader>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="TBU_1" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="TBU_2" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="TBU_3" />
     </ListItemButton>
   </>
 );

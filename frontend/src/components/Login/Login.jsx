@@ -1,4 +1,4 @@
-// import * as React from 'react';
+import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,12 +11,15 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   useNavigate,
 } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { loginState } from "../../atoms/loginState"
+import axios from 'axios';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
@@ -25,15 +28,39 @@ export default function Login() {
   const [, setIsLogin] = useRecoilState(loginState)
 
   const navigate = useNavigate();
-  const handleSubmit = (event) => {
+
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+
+  const handleSubmit = async (event) => {
+    setOpenSnackbar(false);
+
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    // console.log({
+    //   email: data.get('email'),
+    //   password: data.get('password'),
+    // });
+
+    const axiosLoginInstance = axios.create({
+      baseURL: 'http://localhost:8080/api',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      credentials: "same-origin"
     });
-    setIsLogin(() => true);
-    navigate('/');
+
+    const body = `grant_type=&username=${data.get('email')}&password=${data.get('password')}&scope=&client_id=&client_secret=`;
+
+    try {
+      const res = await axiosLoginInstance.post('/login/access-token', body)
+      console.log("login", res);
+      sessionStorage.setItem('token', res.data.access_token);
+      setIsLogin(() => true);
+      navigate('/');
+    } catch (error) {
+      console.log("error on login", error);
+      setOpenSnackbar(true)
+    }
   };
 
   return (
@@ -48,6 +75,19 @@ export default function Login() {
             alignItems: 'center',
           }}
         >
+          <Snackbar
+            anchorOrigin={{ horizontal: 'center', vertical: 'top'}}
+            open={openSnackbar}
+            onClose={() => setOpenSnackbar(false)}
+          >
+            <Alert
+              severity="error"
+              variant="filled"
+              sx={{ width: '100%' }}
+            >
+            認証情報に誤りがあります
+            </Alert>
+          </Snackbar>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
@@ -87,18 +127,6 @@ export default function Login() {
             >
               Log In
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Container>

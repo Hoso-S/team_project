@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -12,16 +12,14 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
-import { courses, takes } from '../../assets/sampleData.js'
+import { instructors } from '../../assets/sampleData.js'
 import { Box } from '@mui/material';
-import { useRecoilState } from "recoil";
-import { pathState } from "../../atoms/pathState"
 // import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { useRecoilState } from "recoil";
+import { pathState } from "../../atoms/pathState.js"
 
 // const rows = [
 //     { id: 1, col1: 'Hello', col2: 'World' },
@@ -30,30 +28,18 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'rec
 // ];
 
 const columns = [
-    { field: 'course_id', headerName: 'コースID', width: 150, headerAlign: 'center' },
-    { field: 'sec_id', headerName: 'セクションID', width: 150, headerAlign: 'center' },
-    { field: 'semester', headerName: 'セメスター', width: 150, headerAlign: 'center' },
-    { field: 'year', headerName: '年度', width: 150, headerAlign: 'center' },
-    { field: 'building', headerName: '建物', width: 150, headerAlign: 'center' },
-    { field: 'room_number', headerName: '部屋番号', width: 150, headerAlign: 'center' },
-    { field: 'time_slot_id', headerName: 'タイムスロット', width: 150, headerAlign: 'center' },
+    { field: 'instructor_id', headerName: 'ID', width: 150, headerAlign: 'center' },
+    { field: 'name', headerName: '名前', width: 150, headerAlign: 'center' },
+    { field: 'dept_name', headerName: '学部', width: 150, headerAlign: 'center' },
+    { field: 'salary', headerName: '給与', width: 150, headerAlign: 'center' },
 ];
 
-const grades = [
-  { name: '0', value: 3 },
-  { name: '1', value: 2 },
-  { name: '2', value: 6 },
-  { name: '3', value: 12 },
-  { name: '4', value: 16 },
-  { name: '5', value: 4 }
-];
-
-export default function CourseSection() {
-  const [, setPath] = useRecoilState(pathState);
-  useEffect(() => {
-    setPath(() => "科目");
-  }, []);
-
+export default function Instructors() {
+    const [, setPath] = useRecoilState(pathState);
+    useEffect(() => {
+        setPath(() => "教員");
+    }, []);
+  
   const onClickSearch = () => {
     console.log('search');
   }
@@ -67,18 +53,6 @@ export default function CourseSection() {
   const handleYearChange = (newValue) => {
     setYear(newValue)
   }
-
-  const [openDialog, setOpenDialog] = useState(false);
-  const [selectedRow, setSelectedRow] = useState({});
-
-  const handleRowClick = (params) => {
-    setSelectedRow(params.row);
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
 
   return (
     <>
@@ -200,32 +174,10 @@ export default function CourseSection() {
       </Box>
       <Box>
         <DataGrid
-          rows={courses}
-          getRowId={(row) => `${row.course_id}-${row.sec_id}`}
+          rows={instructors}
+          getRowId={(row) => row.instructor_id}
           columns={columns}
-          onRowClick={handleRowClick} 
         />
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>成績分布</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {`ID: ${selectedRow.course_id || ''}`}
-              <br />
-              {`Name: ${selectedRow.name || ''}`}
-              {/* その他のデータ... */}
-              <BarChart width={480} height={300} data={grades}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="#1976d2" />
-              </BarChart>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>閉じる</Button>
-          </DialogActions>
-        </Dialog>
       </Box>
     </>
   );

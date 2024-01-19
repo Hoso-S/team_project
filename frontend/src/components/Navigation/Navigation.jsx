@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
@@ -12,12 +12,13 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import { mainListItems, secondaryListItems } from './ListItems.jsx';
+import { mainListItems } from './ListItems.jsx';
 import {
     useNavigate,
   } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { loginState } from "../../atoms/loginState"
+import { pathState } from "../../atoms/pathState"
 
 const drawerWidth = 240;
 
@@ -66,12 +67,13 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 export default function Navigation() {
-  const [open, setOpen] = React.useState(true);
+    const [path, ] = useRecoilState(pathState);
+  const [open, setOpen] = useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -82,6 +84,7 @@ export default function Navigation() {
   const [, setIsLogin] = useRecoilState(loginState)
   const navigate = useNavigate();
   const onClickLogut = () => {
+    sessionStorage.removeItem("token");
     setIsLogin(() => false);
     navigate('/login');
   }
@@ -110,7 +113,7 @@ export default function Navigation() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Home
+              {path}
             </Typography>
             <div>
               <IconButton
@@ -159,8 +162,6 @@ export default function Navigation() {
           <Divider />
           <List component="nav">
             {mainListItems}
-            <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
           </List>
         </Drawer>
     </>
