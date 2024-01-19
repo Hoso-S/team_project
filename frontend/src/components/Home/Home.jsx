@@ -6,29 +6,45 @@ import axios from 'axios';
 import { Button } from '@mui/material';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: '/api/',
   headers: {
     'Content-Type': 'application/json',
   },
 });
+console.log("@@@@@@@@@@@@@@@@");
+
 
 export default function Home() {
+  const user = {
+    email: "test1",
+    is_active: true,
+    is_superuser: true,
+    password: "p@ssword",
+  };
   const onClickTest = () => {
-    const user = {
-      email: "test1",
-      is_activate: true,
-      is_superuser: true,
-      password: "p@ssword",
-    };
-    axiosInstance.post('/users', user)
+
+    axiosInstance.post('users', user)
       .then((res) => { console.log("createUsers", res); })
       .catch(console.error);
   };
 
   React.useEffect(() => {
-    axiosInstance.get('/users/?skip=0&limit=100')
+    axiosInstance.get('users/?skip=0&limit=100')
       .then((res) => { console.log("getUsers", res); })
       .catch(console.error);
+
+      
+    // fetch("api/users",{
+    //   body: JSON.stringify(user),
+    //   method: 'POST',
+    //   headers: {
+    //     Accept: 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   credentials: 'same-origin',
+    //   mode: 'same-origin',
+    //   // redirect: 'follow',
+    // }).then(res=>res.json()).then(console.log).catch(console.error);
   }, []);
 
   return (

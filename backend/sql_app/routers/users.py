@@ -58,10 +58,14 @@ def create_user(
     request: Request,
     csrf_protect: CsrfProtect = Depends(),
 ):
+    print("@@@@@@@@@@@@@@@@@@@@@@@22122")
     csrf_protect.validate_csrf(request)
+    print("@@@@@@@@@@@@@@@@@@@@@@@22222")
     db_user = get_user_by_email(db, email=user.email)
+    print("@@@@@@@@@@@@@@@@@@@@@@@22322", db_user)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+    print("@@@@@@@@@@@@@@@@@@@@@@@22422")
     return insert_user(db=db, user=user)
 
 
