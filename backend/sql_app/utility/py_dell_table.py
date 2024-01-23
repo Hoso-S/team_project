@@ -8,6 +8,8 @@ cursor = conn.cursor()
 cursor.execute('DELETE FROM student')
 cursor.execute('DELETE FROM instructor')
 cursor.execute('DELETE FROM section')
+cursor.execute('DELETE FROM course')
+cursor.execute('DELETE FROM takes')
 
 # 変更を保存
 conn.commit()
