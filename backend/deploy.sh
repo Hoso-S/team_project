@@ -3,6 +3,18 @@
 sudo service aiit stop #停止
 
 # 仮想環境のフォルダのパス
+devdb_folder="dev.db"
+
+if [ -e "$devdb_folder" ]; then
+    # データベースファイル dev.db の作成
+    python3 sql_app/utility/py_create_table.py
+    # データベースファイル dev.db にサンプルデータを一括で登録
+    python3 sql_app/utility/py_insert_table.py
+else
+    # NOP
+fi
+
+# 仮想環境のフォルダのパス
 venv_folder="venv"
 
 if [ -d "$venv_folder" ]; then
