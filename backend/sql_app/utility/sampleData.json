@@ -1,0 +1,17 @@
+{
+    "student": [
+        { "student_id": "1", "name": "テスト 太郎", "dept_name": "経済学部", "tot_cred": 1 },
+        { "student_id": "2", "name": "試験 花子", "dept_name": "社会学部", "tot_cred": 2 },
+        { "student_id": "3", "name": "サンプル データ", "dept_name": "法学部", "tot_cred": 3 }
+    ],
+    "instructor": [
+        { "instructor_id": "1", "name": "テスト 先生", "dept_name": "経済学部", "salary": 80000 },
+        { "instructor_id": "2", "name": "試験 先生", "dept_name": "経済学部", "salary": 60000 },
+        { "instructor_id": "3", "name": "データ 先生", "dept_name": "経済学部", "salary": 75000 }
+    ],
+    "course": [
+        { "course_id": "1", "instructor_id": "1", "sec_id": "1", "semester": "Spring", "year": 2022, "building": "North", "room_number": "1", "time_slot_id": "1" },
+        { "course_id": "1", "instructor_id": "1", "sec_id": "2", "semester": "Fall", "year": 2022, "building": "East", "room_number": "2", "time_slot_id": "2" },
+        { "course_id": "1", "instructor_id": "1", "sec_id": "3", "semester": "Winter", "year": 2022, "building": "West", "room_number": "3", "time_slot_id": "3" }
+    ]
+}
