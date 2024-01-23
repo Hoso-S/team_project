@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -12,8 +12,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
-import { courseSection } from '../../assets/sampleData.js'
+import { courses, takes } from '../../assets/sampleData.js'
 import { Box } from '@mui/material';
+import { useRecoilState } from "recoil";
+import { pathState } from "../../atoms/pathState"
 // import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -46,7 +48,12 @@ const grades = [
   { name: '5', value: 4 }
 ];
 
-export default function Home() {
+export default function CourseSection() {
+  const [, setPath] = useRecoilState(pathState);
+  useEffect(() => {
+    setPath(() => "科目");
+  }, []);
+
   const onClickSearch = () => {
     console.log('search');
   }
@@ -193,7 +200,7 @@ export default function Home() {
       </Box>
       <Box>
         <DataGrid
-          rows={courseSection}
+          rows={courses}
           getRowId={(row) => `${row.course_id}-${row.sec_id}`}
           columns={columns}
           onRowClick={handleRowClick} 
@@ -202,17 +209,16 @@ export default function Home() {
           <DialogTitle>成績分布</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {`ID: ${selectedRow.id || ''}`}
+              {`ID: ${selectedRow.course_id || ''}`}
               <br />
               {`Name: ${selectedRow.name || ''}`}
               {/* その他のデータ... */}
-              <BarChart width={800} height={300} data={grades}>
+              <BarChart width={480} height={300} data={grades}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Legend />
-                <Bar dataKey="value" fill="#8884d8" />
+                <Bar dataKey="value" fill="#1976d2" />
               </BarChart>
             </DialogContentText>
           </DialogContent>
