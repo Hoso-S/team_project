@@ -23,8 +23,8 @@ for instructor in data['instructor']:
         VALUES (?, ?, ?, ?)
     ''', (instructor['instructor_id'], instructor['name'], instructor['dept_name'], instructor['salary']))
 
-# コースセクションデータを挿入
-for section in data['course']:
+# コースデータを挿入
+for section in data['section']:
     cursor.execute('''
         INSERT INTO section (course_id, instructor_id, sec_id, semester, year, building, room_number, time_slot_id)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -32,6 +32,24 @@ for section in data['course']:
         section['course_id'], section['instructor_id'], section['sec_id'], section['semester'],
         section['year'], section['building'], section['room_number'],
         section['time_slot_id']
+    ))
+
+# セクションデータを挿入
+for course in data['course']:
+    cursor.execute('''
+        INSERT INTO course (course_id, title, dept_name, credits)
+        VALUES (?, ?, ?, ?)
+    ''', (
+        course['course_id'], course['title'], course['dept_name'], course['credits']
+    ))
+
+# takesを挿入 (一意性制約エラーを無視)
+for takes in data['takes']:
+    cursor.execute('''
+        INSERT OR IGNORE INTO takes (student_id, course_id, sec_id, semester, year, grade)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (
+        takes['student_id'], takes['course_id'], takes['sec_id'], takes['semester'], takes['year'], takes['grade']
     ))
 
 # 変更を保存
