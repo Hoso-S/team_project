@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { students } from '../../assets/sampleData.js'
+// import { students } from '../../assets/sampleData.js'
 import { Box } from '@mui/material';
 import { useRecoilState } from "recoil";
 import { pathState } from "../../atoms/pathState"
+import { fetchList } from '../../assets/api.js';
 
 
 const columns = [
@@ -15,8 +16,15 @@ const columns = [
 
 export default function Students() {
   const [, setPath] = useRecoilState(pathState);
+  const [students, setStudents] = useState([]);
+
   useEffect(() => {
     setPath(() => "生徒");
+    const fetchData = async () => {
+      const res = await fetchList('students');
+      setStudents(res);
+    };
+    fetchData();
   }, []);
 
   return (

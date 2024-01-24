@@ -11,8 +11,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import { DataGrid } from '@mui/x-data-grid';
-import { courses, takes } from '../../assets/sampleData.js'
 import { Box } from '@mui/material';
 import { useRecoilState } from "recoil";
 import { pathState } from "../../atoms/pathState"
@@ -21,38 +27,51 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-
-// const rows = [
-//     { id: 1, col1: 'Hello', col2: 'World' },
-//     { id: 2, col1: 'DataGridPro', col2: 'is Awesome' },
-//     { id: 3, col1: 'MUI', col2: 'is Amazing' },
-// ];
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { fetchList } from '../../assets/api.js';
 
 const columns = [
-    { field: 'course_id', headerName: 'コースID', width: 150, headerAlign: 'center' },
-    { field: 'sec_id', headerName: 'セクションID', width: 150, headerAlign: 'center' },
-    { field: 'semester', headerName: 'セメスター', width: 150, headerAlign: 'center' },
-    { field: 'year', headerName: '年度', width: 150, headerAlign: 'center' },
-    { field: 'building', headerName: '建物', width: 150, headerAlign: 'center' },
-    { field: 'room_number', headerName: '部屋番号', width: 150, headerAlign: 'center' },
-    { field: 'time_slot_id', headerName: 'タイムスロット', width: 150, headerAlign: 'center' },
-];
-
-const grades = [
-  { name: '0', value: 3 },
-  { name: '1', value: 2 },
-  { name: '2', value: 6 },
-  { name: '3', value: 12 },
-  { name: '4', value: 16 },
-  { name: '5', value: 4 }
+    { field: 'dept_name', headerName: '学部名', headerAlign: 'center' },
+    //{ field: 'course_id', headerName: 'コースID', width: 150, headerAlign: 'center' },
+    { field: 'title', headerName: '講義名', headerAlign: 'center' },
+    { field: 'name', headerName: '教員名', headerAlign: 'center' },
+    { field: 'sec_id', headerName: 'セクションID', headerAlign: 'center' },
+    { field: 'semester', headerName: 'セメスター', headerAlign: 'center' },
+    { field: 'year', headerName: '年度', headerAlign: 'center' },
+    { field: 'building', headerName: '建物', headerAlign: 'center' },
+    { field: 'room_number', headerName: '部屋番号', headerAlign: 'center' },
+    // { field: 'time_slot_id', headerName: 'タイムスロット', headerAlign: 'center' },
 ];
 
 export default function CourseSection() {
   const [, setPath] = useRecoilState(pathState);
   useEffect(() => {
     setPath(() => "科目");
+    fetchData();
   }, []);
+
+  const [rows, setRows] = useState([]);
+
+  const fetchData = async () => {
+    const courses = await fetchList('courses');
+    const sections = await fetchList('sections');
+    const instructors = await fetchList('instructors');
+    const courseSections = sections.map((section) => {
+      const course = courses.find((course) => course.course_id === section.course_id);
+      return {
+        ...course,
+        ...section,
+      };
+    });
+    const courseSectionInstructor = courseSections.map((courseSection) => {
+      const instructor = instructors.find((instructor) => instructor.instructor_id === courseSection.instructor_id);
+      return {
+        ...courseSection,
+        ...instructor,
+      };
+    });
+    setRows(courseSectionInstructor);
+  }
 
   const onClickSearch = () => {
     console.log('search');
@@ -70,9 +89,39 @@ export default function CourseSection() {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState({});
+  const [calculatedRowData, setCalculatedRowData] = useState({});
+  const [rowData, setRowData] = useState([]);
 
-  const handleRowClick = (params) => {
+  const handleRowClick = async (params) => {
+    console.log(params.row);
+    const takes = await fetchList('takes');
+    console.log({takes});
+    const sectionTakes = takes.filter((take) => take.course_id === params.row.course_id && take.sec_id === params.row.sec_id && take.semester === params.row.semester && take.year === params.row.year);
+
+    // 集計
+    const gradeCounts = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0 };
+    sectionTakes.forEach(take => {
+      gradeCounts[take.grade]++;
+    });
+    const gradeCountsArray = Object.entries(gradeCounts).map(([grade, count]) => ({
+      name: grade,
+      value: count
+    }));
+
+    // 生徒情報をマージ
+    const students = await fetchList('students');
+    console.log({students});
+    const takesData = sectionTakes.map((take) => {
+      const student = students.find((student) => take.student_id === student.student_id);
+      return {
+        ...take,
+        ...student,
+      };
+    });
+    console.log({takesData});
     setSelectedRow(params.row);
+    setCalculatedRowData(gradeCountsArray);
+    setRowData(takesData);
     setOpenDialog(true);
   };
 
@@ -132,65 +181,7 @@ export default function CourseSection() {
                     onClick={onClickSearch}
                     sx={{ mt: 3, ml: 1 }}
                   >
-                    検索
-                  </Button>
-                </Box>
-              </Grid>
-            </Box>
-          </AccordionDetails>
-        </Accordion>
-      </Box>
-      <Box sx={{ mb: 3 }}>
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ArrowDropDownIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-          >
-            <Typography>検索</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Box sx={{ display: 'flex' }}>
-              <Grid container>
-                <Grid item xs={12} sm={12}>
-                  <FormControl fullWidth>
-                    <TextField id="course-name" label="コース名" variant="standard" />
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
-                  {/* <TextField id="year" label="年度" variant="standard" /> */}
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DatePicker
-                      label="年度"
-                      value={year}
-                      onChange={handleYearChange}
-                      views={['year']}
-                      slot={{ textField: { variant: 'outlined' } }}
-                    />
-                  </LocalizationProvider>
-                </Grid>
-                <Grid item xs={12} sm={12} sx={{ mt: 2 }}>
-                  <FormControl sx={{ minWidth: 180 }}>
-                    <InputLabel id="semester-select-label">セメスター</InputLabel>
-                    <Select
-                      labelId="semester-select-label"
-                      value={semester}
-                      onChange={(handleSemesterChange)}
-                    >
-                      <MenuItem value={1}>Spring</MenuItem>
-                      <MenuItem value={2}>Summer</MenuItem>
-                      <MenuItem value={3}>Fall</MenuItem>
-                      <MenuItem value={4}>Winter</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button
-                    variant="contained"
-                    onClick={onClickSearch}
-                    sx={{ mt: 3, ml: 1 }}
-                  >
-                    検索
+                    登録
                   </Button>
                 </Box>
               </Grid>
@@ -200,7 +191,7 @@ export default function CourseSection() {
       </Box>
       <Box>
         <DataGrid
-          rows={courses}
+          rows={rows}
           getRowId={(row) => `${row.course_id}-${row.sec_id}`}
           columns={columns}
           onRowClick={handleRowClick} 
@@ -209,17 +200,44 @@ export default function CourseSection() {
           <DialogTitle>成績分布</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {`ID: ${selectedRow.course_id || ''}`}
+              {`講義: ${selectedRow.title || ''}`}
               <br />
-              {`Name: ${selectedRow.name || ''}`}
+              {`年度: ${selectedRow.year || ''}`}
+              <br />
+              {`セメスター: ${selectedRow.semester || ''}`}
+              <br />
+              {`教員: ${selectedRow.name || ''}`}
               {/* その他のデータ... */}
-              <BarChart width={480} height={300} data={grades}>
+              <BarChart width={480} height={300} data={calculatedRowData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
                 <Bar dataKey="value" fill="#1976d2" />
               </BarChart>
+              <TableContainer component={Paper}>
+                <Table sx={{ width: 480 }} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">名前</TableCell>
+                      <TableCell align="center">学部</TableCell>
+                      <TableCell align="center">成績</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rowData.map((row) => (
+                      <TableRow
+                        key={row.student_id}
+                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                      >
+                        <TableCell align="left">{row.name}</TableCell>
+                        <TableCell align="left">{row.dept_name}</TableCell>
+                        <TableCell align="right">{row.grade}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
