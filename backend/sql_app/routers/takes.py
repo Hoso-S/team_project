@@ -100,7 +100,7 @@ async def read_takes(
 
 @router.get("/", response_model=list[takes])
 async def read_takes(db: SessionDep, skip: int = 0, limit: int = 100):
-    takes = get_takes(db, skip=skip, limit=limit)
+    takes = get_all_takes(db, skip=skip, limit=limit)
     return takes
 
 
