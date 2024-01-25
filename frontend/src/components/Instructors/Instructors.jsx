@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { instructors } from '../../assets/sampleData.js'
+// import { instructors } from '../../assets/sampleData.js'
 import { Box } from '@mui/material';
 import { useRecoilState } from "recoil";
 import { pathState } from "../../atoms/pathState.js"
+import { fetchList } from '../../assets/api.js';
 
 const columns = [
     { field: 'instructor_id', headerName: 'ID', width: 150, headerAlign: 'center' },
@@ -14,8 +15,15 @@ const columns = [
 
 export default function Instructors() {
     const [, setPath] = useRecoilState(pathState);
+    const [instructors, setInstructors] = useState([]);
+
     useEffect(() => {
         setPath(() => "教員");
+        const fetchData = async () => {
+          const res = await fetchList('instructors');
+          setInstructors(res);
+        };
+        fetchData();
     }, []);
 
   return (
