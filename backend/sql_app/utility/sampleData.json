@@ -14,9 +14,51 @@
         },
         {
             "student_id": "3",
-            "name": "サンプル データ",
+            "name": "砂糖 太郎",
             "dept_name": "法学部",
             "tot_cred": 3
+        },
+        {
+            "student_id": "4",
+            "name": "田中 太郎",
+            "dept_name": "文学部",
+            "tot_cred": 4
+        },
+        {
+            "student_id": "5",
+            "name": "佐藤 マーク",
+            "dept_name": "経営学部",
+            "tot_cred": 5
+        },
+        {
+            "student_id": "6",
+            "name": "鈴木 二郎",
+            "dept_name": "経済学部",
+            "tot_cred": 6
+        },
+        {
+            "student_id": "7",
+            "name": "岸野 たけし",
+            "dept_name": "理工学部",
+            "tot_cred": 7
+        },
+        {
+            "student_id": "8",
+            "name": "清水 たいち",
+            "dept_name": "医学部",
+            "tot_cred": 8
+        },
+        {
+            "student_id": "9",
+            "name": "ささき こじろう",
+            "dept_name": "工学部",
+            "tot_cred": 9
+        },
+        {
+            "student_id": "10",
+            "name": "多田 三郎",
+            "dept_name": "法学部",
+            "tot_cred": 10
         }
     ],
     "instructor": [
